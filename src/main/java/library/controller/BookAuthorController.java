@@ -46,7 +46,7 @@ public class BookAuthorController {
      *
      * @return provide list of authors.
      */
-    @GetMapping(value = "/books/authors")
+    @GetMapping(value = "/books/authors", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public List<Author> getListOfAuthors() {
         return repository.findAll(Sort.by(ApiConfiguration.SORT_BY_NAME));
     }
