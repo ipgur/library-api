@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Books / Authors</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"></link>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+
+    <style>
+            .navbar-brand {
+                color: rgba(255, 255, 255, 1.0) !important;
+                font-size: 22px;
+            }
+
+            .series {
+                font-size: 10px;
+            }
+
+            .isbn {
+                font-size: 10px;
+            }
+
+            .tag {
+                font-size: 10px;
+                float: left;
+                margin-right: 2px;
+            }            
+        </style>
+</head>
+
+<body>
+<div id="content" class="content">
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <a class="navbar-brand" href="#"> Автори ({{ authors.length }})</a>
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/books">Книги</a>
+            </li>
+
+        </ul>
+
+        <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="search"
+                   placeholder="Search" aria-label="Search"
+                   v-model="search">
+        </form>
+    </nav>
+
+    <div class="container">
+        <table class="table table-striped table-sm">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Автори</th>
+                <th>Рожденно място</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(author, index) in filteredAuthors">
+                <td>{{ index+1 }}</td>
+                <td>{{author.name}}</td>
+                <td>{{author.birthplace}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+var app = new Vue({
+    el: '#content',
+    data: {
+        search: '',
+        authors: [],
+        nameState: null,
+        new_author: {
+            name: ''
+        }
+    },
+
+    computed: {
+        filteredAuthors() {
+            var searchText = this.search.toLowerCase();
+            return this.authors.filter( author => {
+                return author.name.toLowerCase().includes(searchText);
+            });
+        }
+    },
+
+    methods: {
+        loadAuthors() {
+            axios
+                .get('/books/authors')
+                .then(response => (this.authors = response.data));
+        }
+    },
+
+    mounted() {
+        this.loadAuthors();
+        if (localStorage.authorSearch) {
+            this.search = localStorage.authorSearch;
+        }
+    },
+
+    watch: {
+        search(newSearch) {
+            localStorage.authorSearch = newSearch;
+        }
+    }
+})
+        </script>
+</body>
+</html>

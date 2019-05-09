@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/XSL/Transform">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Books</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"></link>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+
+
+    <style>
+            .navbar-brand {
+                color: rgba(255, 255, 255, 1.0) !important;
+                font-size: 22px;
+            }
+
+            .series {
+                font-size: 10px;
+            }
+
+            .isbn {
+                font-size: 10px;
+            }
+
+            .tag {
+                font-size: 10px;
+                float: left;
+                margin-right: 2px;
+            }
+            .pagination {
+                margin-top: 12px;
+            }
+        </style>
+</head>
+
+<body>
+<div id="content" class="content">
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <a class="navbar-brand" href="/books">Книги</a>
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/books/authors">Автори</a>
+            </li>
+        </ul>
+
+        <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="search"
+                   placeholder="Search" aria-label="Search"
+                   v-model="search">
+        </form>
+    </nav>
+
+    <div class="container">
+        <b-pagination class="pagination" size="md" :total-rows="totalItems" v-model="currentPage" :per-page="perPage"></b-pagination>
+        <b-table :busy="isBusy" class="table table-striped table-sm"
+                 :fields="fields" :items="books"
+                 :filter="search" :filter-function="filterBook"
+                 :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" :current-page="currentPage" :per-page="0">
+            <div slot="table-busy" class="text-center text-danger my-2">
+                <b-spinner class="align-middle"></b-spinner>
+                <strong>Loading...</strong>
+            </div>
+
+            <template slot="title" slot-scope="data">
+                <span class="title" v-on:click="$bvModal.show('description' + data.index)">{{ data.item.title }}</span>
+
+                <b-modal ok-only scrollable centered
+                         header-bg-variant="dark" header-text-variant="light"
+                         v-bind:id="'description' + data.index" v-bind:title="data.item.title">
+                    {{ data.item.description }}
+                </b-modal>
+            </template>
+
+            <template slot="author" slot-scope="data">{{ data.item.author.name }}</template>
+            <template slot="link" slot-scope="data" v-bind:href="'http://strumski.com/readbook/?id=' + data.item.id">
+                    <a :href="`http://strumski.com/readbook/?id=${data.item.id}`">strumski.com</a>
+            </template>
+        </b-table>
+
+
+    </div>
+</div>
+
+<script>
+var app = new Vue({
+    el: '#content',
+    data: {
+        sortBy: 'title',
+        sortDesc: false,
+        search: '',
+        fields: [
+            {key: 'title', label: 'Заглавие', sortable: true},
+            {key: 'author', label: 'Автор', sortable: true},
+            {key: 'link', label: 'Прочети на', sortable: false},
+        ],
+        currentPage: 1,
+        perPage: 30,
+        totalItems: 120,
+        isBusy: true,
+        books: []
+    },
+
+    mounted() {
+
+        this.fetchData().catch(error => {
+          console.error(error)
+        })
+
+        if (localStorage.bookSearch) {
+            this.search = localStorage.bookSearch;
+        }
+
+    },
+
+    watch: {
+        search(newSearch) {
+            localStorage.bookSearch = newSearch;
+        },
+        currentPage: {
+          handler: function(value) {
+            this.fetchData().catch(error => {
+              console.error(error)
+            })
+          }
+        }
+    },
+
+    methods: {
+        filterBook(book) {
+            console.log(book)
+            var searchText = this.search.toLowerCase();
+            return book.title.toLowerCase().includes(searchText);
+        },
+
+        async fetchData() {
+        this.isBusy = true;
+          this.items = axios.get("/books/" + this.currentPage)
+            .then(response => {
+            this.books = response.data;
+            console.log(response.headers);
+            this.totalItems = parseInt(response.headers["x-total-count"], 10);
+            console.log(this.totalItems);
+            this.isBusy = false;
+            })
+        }
+
+
+    }
+})
+        </script>
+</body>
+</html>
