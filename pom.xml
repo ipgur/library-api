@@ -17,6 +17,10 @@
         <mysql.version>8.0.15</mysql.version>
         <swagger.version>2.9.2</swagger.version>
         <specification.arg.resolver.version>2.1.1</specification.arg.resolver.version>
+        <logger.version>1.8.0-beta4</logger.version>
+        <java.inject.version>1</java.inject.version>
+        <aws.java.sdk.secretsmanager.version>1.11.550</aws.java.sdk.secretsmanager.version>
+        <aws.java.sdk.kms.version>1.11.550</aws.java.sdk.kms.version>
     </properties>
 
     <dependencies>
@@ -84,6 +88,29 @@
         <version>${swagger.version}</version>
     </dependency>
 
+    <dependency>
+        <groupId>com.amazonaws</groupId>
+        <artifactId>aws-java-sdk-secretsmanager</artifactId>
+        <version>${aws.java.sdk.secretsmanager.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.amazonaws</groupId>
+        <artifactId>aws-java-sdk-kms</artifactId>
+        <version>${aws.java.sdk.kms.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>${logger.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject</artifactId>
+        <version>${java.inject.version}</version>
+    </dependency>
 
     </dependencies>
 
