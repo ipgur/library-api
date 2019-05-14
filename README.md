@@ -1,5 +1,7 @@
 A read-only REST API that sources the MySQL database behind strumski.com and provides read-access to books and authors.
 
+Demo available at: http://strumskiapi-env.ptjyutvivi.eu-central-1.elasticbeanstalk.com/
+
 - Uses undertow as servlet container.
 - Supports retrieving credentials from AWS KMS
 - Integrates Swagger UI
