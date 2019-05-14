@@ -5,6 +5,7 @@ Demo available at: http://strumskiapi-env.ptjyutvivi.eu-central-1.elasticbeansta
 - Uses undertow as servlet container.
 - Supports retrieving credentials from AWS KMS
 - Integrates Swagger UI
+- Supports reporting to cloud watch
 - Provides two sample VUE.js pages that use the API to display books and authors
 
 
