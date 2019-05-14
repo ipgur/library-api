@@ -72,7 +72,7 @@ public class BookController {
      *
      * @return provide list of books rendered into HTML.
      */
-    @GetMapping(value = "/books", produces = MediaType.TEXT_HTML_VALUE)
+    @GetMapping(value = {"/books", "/"}, produces = MediaType.TEXT_HTML_VALUE)
     public String renderHtml() {
         String content = null;
         try {

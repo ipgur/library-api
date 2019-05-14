@@ -15,8 +15,12 @@
  */
 package library.tools;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.FileCopyUtils;
+
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Objects;
 
@@ -31,8 +35,8 @@ public class FileTools {
      * @throws IOException
      */
     public static String readResourceFile(final String path) throws IOException {
-       ClassLoader classLoader = FileTools.class.getClassLoader();
-       File file = new File(Objects.requireNonNull(classLoader.getResource(path)).getFile());
-       return new String(Files.readAllBytes(file.toPath()));
+       ClassPathResource cpr = new ClassPathResource(path);
+       byte[] bdata = FileCopyUtils.copyToByteArray(cpr.getInputStream());
+       return new String(bdata, StandardCharsets.UTF_8);
     }
 }
