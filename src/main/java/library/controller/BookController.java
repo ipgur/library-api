@@ -15,6 +15,8 @@
  */
 package library.controller;
 
+import com.codahale.metrics.annotation.Metered;
+import com.codahale.metrics.annotation.Timed;
 import library.configuration.ApiConfiguration;
 import library.database.BookRepository;
 import library.exceptions.InternalServerError;
@@ -73,6 +75,8 @@ public class BookController {
      * @return provide list of books rendered into HTML.
      */
     @GetMapping(value = {"/books", "/"}, produces = MediaType.TEXT_HTML_VALUE)
+    @Timed(name = "renderBooks")
+    @Metered
     public String renderHtml() {
         String content = null;
         try {
@@ -95,6 +99,8 @@ public class BookController {
      * @param page the page to be queried
      * @return provide list of books.
      */
+    @Timed(name = "getPageBooks")
+    @Metered
     @GetMapping(value = "/books/{page}")
     public List<Book> getListOfBooksByNamePageable(HttpServletResponse response, @PathVariable Integer page) {
         response.addHeader(ApiConfiguration.X_TOTAL_COUNT_HEADER, String.valueOf(bookRepository.count()));

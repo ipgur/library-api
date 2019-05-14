@@ -21,6 +21,9 @@
         <java.inject.version>1</java.inject.version>
         <aws.java.sdk.secretsmanager.version>1.11.550</aws.java.sdk.secretsmanager.version>
         <aws.java.sdk.kms.version>1.11.550</aws.java.sdk.kms.version>
+        <metrics.version>4.0.2</metrics.version>
+        <metrics.spring.version>3.1.3</metrics.spring.version>
+        <metrics.cloudwatch.version>1.0.11</metrics.cloudwatch.version>
     </properties>
     <packaging>jar</packaging>
 
@@ -111,6 +114,61 @@
         <artifactId>javax.inject</artifactId>
         <version>${java.inject.version}</version>
     </dependency>
+
+    <dependency>
+        <groupId>io.dropwizard.metrics</groupId>
+        <artifactId>metrics-core</artifactId>
+        <version>${metrics.version}</version>
+        <exclusions>
+            <exclusion>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+
+    <dependency>
+        <groupId>io.dropwizard.metrics</groupId>
+        <artifactId>metrics-servlets</artifactId>
+        <version>${metrics.version}</version>
+        <exclusions>
+            <exclusion>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+
+    <dependency>
+        <groupId>com.ryantenney.metrics</groupId>
+        <artifactId>metrics-spring</artifactId>
+        <version>${metrics.spring.version}</version>
+        <exclusions>
+            <exclusion>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aop</artifactId>
+            </exclusion>
+            <exclusion>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context-support</artifactId>
+            </exclusion>
+            <exclusion>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+            </exclusion>
+            <exclusion>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+
+    <dependency>
+        <groupId>io.github.azagniotov</groupId>
+        <artifactId>dropwizard-metrics-cloudwatch</artifactId>
+        <version>${metrics.cloudwatch.version}</version>
+    </dependency>
+
 
     </dependencies>
 

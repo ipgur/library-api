@@ -15,6 +15,8 @@
  */
 package library.controller;
 
+import com.codahale.metrics.annotation.Metered;
+import com.codahale.metrics.annotation.Timed;
 import library.configuration.ApiConfiguration;
 import library.database.BookAuthorRepository;
 import library.exceptions.InternalServerError;
@@ -47,6 +49,8 @@ public class BookAuthorController {
      * @return provide list of authors.
      */
     @GetMapping(value = "/books/authors", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @Timed(name = "getAllAuthors")
+    @Metered
     public List<Author> getListOfAuthors() {
         return repository.findAll(Sort.by(ApiConfiguration.SORT_BY_NAME));
     }
@@ -70,6 +74,8 @@ public class BookAuthorController {
      * @return provide list of book authors rendered into HTML.
      */
     @GetMapping(value = "/books/authors", produces = MediaType.TEXT_HTML_VALUE)
+    @Timed(name = "renderAuthors")
+    @Metered
     public String renderHtml() {
         String content = null;
         try {

@@ -67,15 +67,12 @@ public class AWSSecretManagerProvider implements SecretProvider{
             // Depending on whether the secret was a string or binary, one of these fields will be populated
             if (getSecretValueResult.getSecretString() != null) {
                 String jsonSecret = getSecretValueResult.getSecretString();
-                logger.info(jsonSecret);
                 try {
                     JsonNode actualObj = objectMapper.readTree(jsonSecret);
                     secret = actualObj.get(key).asText();
                 } catch (IOException e) {
                     logger.error("Error while retrieving secrets from AWS Secret manager", e);
                 }
-
-                logger.info(secret);
             }
 
             keyCallback.accept(key, secret);
