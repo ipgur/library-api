@@ -17,15 +17,13 @@ package library.metrics;
 
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.health.HealthCheckRegistry;
-import com.codahale.metrics.servlets.AdminServlet;
 import com.ryantenney.metrics.spring.config.annotation.EnableMetrics;
 import com.ryantenney.metrics.spring.config.annotation.MetricsConfigurerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.concurrent.TimeUnit;
@@ -35,6 +33,9 @@ import java.util.concurrent.TimeUnit;
 public class MetricsReporterConfig extends MetricsConfigurerAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(MetricsReporterConfig.class);
+
+    @Autowired
+    private ApplicationContext context;
 
     @Value("${monitoring.metrics.reporter.updatePeriodSeconds: 60}")
     private long updatePeriodSeconds;
@@ -66,7 +67,7 @@ public class MetricsReporterConfig extends MetricsConfigurerAdapter {
      */
     private void registerCloudWatchReporter(MetricRegistry metricRegistry) {
         LOG.info("Registering cloud watch reporter");
-        final MetricsReporterProvider provider = new MetricsCloudWatchReporterProvider();
+        final MetricsReporterProvider provider = context.getBean(MetricsCloudWatchReporterProvider.class);
         registerReporter(provider.createReporter(metricRegistry)).start(updatePeriodSeconds, TimeUnit.SECONDS);
     }
 

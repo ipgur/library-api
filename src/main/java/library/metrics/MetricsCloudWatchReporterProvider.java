@@ -21,12 +21,12 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.ScheduledReporter;
 import io.github.azagniotov.metrics.reporter.cloudwatch.CloudWatchReporter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 /**
  * Provides an AWS cloud watch provider
  */
-@Configuration
+@Component
 public class MetricsCloudWatchReporterProvider implements MetricsReporterProvider {
 
     @Value("${monitoring.metrics.reporter.cloudwatch.namespace:strumski}")
