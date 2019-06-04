@@ -16,6 +16,8 @@
 package library.database;
 
 import library.model.Author;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -35,6 +37,7 @@ public interface BookAuthorRepository extends JpaRepository<Author, String>,
      */
     @Transactional(readOnly = true)
     @Override
+    @Cacheable("allAuthors")
     List<Author> findAll();
 
     /**
@@ -42,6 +45,15 @@ public interface BookAuthorRepository extends JpaRepository<Author, String>,
      */
     @Transactional(readOnly = true)
     @Override
+    @Cacheable("authorsBySpec")
     List<Author> findAll(final Specification<Author> spec);
+
+    /**
+     * @return list of  all authors
+     */
+    @Transactional(readOnly = true)
+    @Override
+    @Cacheable("authorsBySort")
+    List<Author> findAll(Sort sort);
 }
 

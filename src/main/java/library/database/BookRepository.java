@@ -16,10 +16,11 @@
 package library.database;
 
 import library.model.Book;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -29,7 +30,7 @@ import java.util.List;
  */
 @Transactional
 public interface BookRepository extends JpaRepository<Book, Integer>,
-        JpaSpecificationExecutor<Book>, PagingAndSortingRepository<Book, Integer> {
+        JpaSpecificationExecutor<Book> {
 
     /**
      * @return all of the books
@@ -44,6 +45,15 @@ public interface BookRepository extends JpaRepository<Book, Integer>,
      */
     @Transactional(readOnly = true)
     @Override
+    @Cacheable("booksBySpec")
     List<Book> findAll(final Specification<Book> spec);
 
+    @Transactional(readOnly = true)
+    @Override
+    @Cacheable("booksByPage")
+    Page<Book> findAll(org.springframework.data.domain.Pageable pageable);
+
+    @Override
+    @Cacheable("booksCount")
+    long count();
 }
