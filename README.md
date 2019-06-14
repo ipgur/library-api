@@ -14,3 +14,4 @@ BetterCode    | [![BCH compliance](https://bettercodehub.com/edge/badge/ipgur/li
 - Integrates Swagger UI
 - Supports reporting to cloud watch
 - Provides two sample VUE.js pages that use the API to display books and authors
+- Short-circuits the cache layer in case of problems
