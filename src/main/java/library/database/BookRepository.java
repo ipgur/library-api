@@ -31,7 +31,6 @@ import java.util.List;
 @Transactional
 public interface BookRepository extends JpaRepository<Book, Integer>,
         JpaSpecificationExecutor<Book> {
-
     /**
      * @return all of the books
      */
@@ -50,10 +49,31 @@ public interface BookRepository extends JpaRepository<Book, Integer>,
 
     @Transactional(readOnly = true)
     @Override
-    @Cacheable("booksByPage")
     Page<Book> findAll(org.springframework.data.domain.Pageable pageable);
 
+    @Transactional(readOnly = true)
+    @Cacheable("booksByPage")
+    default Page<Book> findAllAndCache(org.springframework.data.domain.Pageable pageable) {
+        return findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    default Page<Book> findAllNoCache(org.springframework.data.domain.Pageable pageable) {
+        return findAll(pageable);
+    }
+
     @Override
-    @Cacheable("booksCount")
+    @Transactional(readOnly = true)
     long count();
+
+    @Transactional(readOnly = true)
+    @Cacheable("booksCount")
+    default long countAndCache() {
+        return count();
+    }
+
+    @Transactional(readOnly = true)
+    default long countNoCache() {
+        return count();
+    }
 }

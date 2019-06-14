@@ -22,9 +22,11 @@ import library.database.BookRepository;
 import library.exceptions.InternalServerError;
 import library.model.Book;
 import library.tools.FileTools;
+import library.tools.ShortCircuit;
 import net.kaczmarzyk.spring.data.jpa.domain.LikeIgnoreCase;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -42,6 +44,9 @@ import java.util.List;
  */
 @RestController
 public class BookController {
+
+    @Autowired @Qualifier("RedisShortCircuit")
+    private transient ShortCircuit redisShortCircuit;
 
     @Autowired
     private transient BookRepository bookRepository;
@@ -103,8 +108,13 @@ public class BookController {
     @Metered
     @GetMapping(value = "/books/{page}")
     public List<Book> getListOfBooksByNamePageable(HttpServletResponse response, @PathVariable Integer page) {
-        response.addHeader(ApiConfiguration.X_TOTAL_COUNT_HEADER, String.valueOf(bookRepository.count()));
-        return bookRepository.findAll(PageRequest.of(page, ApiConfiguration.PAGE_SIZE, Sort.by(ApiConfiguration.SORT_BY_TITLE))).getContent();
+        final boolean useCache = redisShortCircuit.isOpen();
+        response.addHeader(ApiConfiguration.X_TOTAL_COUNT_HEADER,
+                String.valueOf(useCache ? bookRepository.countAndCache() : bookRepository.countNoCache()));
+        return useCache ? bookRepository.findAllAndCache(PageRequest.of(page, ApiConfiguration.PAGE_SIZE,
+                Sort.by(ApiConfiguration.SORT_BY_TITLE))).getContent() :
+                bookRepository.findAllNoCache(PageRequest.of(page, ApiConfiguration.PAGE_SIZE,
+                        Sort.by(ApiConfiguration.SORT_BY_TITLE))).getContent();
     }
 
 }

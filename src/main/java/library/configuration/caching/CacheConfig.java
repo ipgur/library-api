@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package library;
+package library.configuration.caching;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.cache.interceptor.CacheErrorHandler;
+import org.springframework.context.annotation.Configuration;
 
-@SpringBootApplication
-@EnableJpaRepositories
-@ComponentScan
-public class Application {
+@EnableCaching
+@Configuration
+public class CacheConfig extends CachingConfigurerSupport {
 
-    /**
-     * Spring application entry point.
-     *
-     * @param args command line arguments
-     */
-    public static void main(final String[] args) {
-        SpringApplication.run(Application.class, args);
+    @Autowired
+    private CustomCacheErrorHandler customCacheErrorHandler;
+
+    @Override
+    public CacheErrorHandler errorHandler() {
+        return customCacheErrorHandler;
     }
 }
