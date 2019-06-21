@@ -70,11 +70,13 @@ public class Book implements Serializable {
      * number of times the book was read
      */
     @JsonProperty("number_read")
+    @Column(name="number_read")
     private int numberRead;
 
     /**
      * number of times the book was opened
      */
     @JsonProperty("number_opened")
+    @Column(name="number_opened")
     private int numberOpened;
 }

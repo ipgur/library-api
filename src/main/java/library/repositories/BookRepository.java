@@ -21,20 +21,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
  * CRUD Access to book data.
  */
-@Transactional
 public interface BookRepository extends JpaRepository<Book, Integer>,
         JpaSpecificationExecutor<Book> {
     /**
      * @return all of the books
      */
-    @Transactional(readOnly = true)
     @Override
     List<Book> findAll();
 
@@ -42,37 +39,30 @@ public interface BookRepository extends JpaRepository<Book, Integer>,
      * @param spec the search spec
      * @return list of books matching the searching criteria
      */
-    @Transactional(readOnly = true)
     @Override
     @Cacheable("booksBySpec")
     List<Book> findAll(final Specification<Book> spec);
 
-    @Transactional(readOnly = true)
     @Override
     Page<Book> findAll(org.springframework.data.domain.Pageable pageable);
 
-    @Transactional(readOnly = true)
     @Cacheable("booksByPage")
     default Page<Book> findAllAndCache(org.springframework.data.domain.Pageable pageable) {
         return findAll(pageable);
     }
 
-    @Transactional(readOnly = true)
     default Page<Book> findAllNoCache(org.springframework.data.domain.Pageable pageable) {
         return findAll(pageable);
     }
 
     @Override
-    @Transactional(readOnly = true)
     long count();
 
-    @Transactional(readOnly = true)
     @Cacheable("booksCount")
     default long countAndCache() {
         return count();
     }
 
-    @Transactional(readOnly = true)
     default long countNoCache() {
         return count();
     }

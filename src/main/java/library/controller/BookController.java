@@ -31,6 +31,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -107,6 +108,7 @@ public class BookController {
     @Timed(name = "getPageBooks")
     @Metered
     @GetMapping(value = "/books/{page}")
+    @Transactional(readOnly = true)
     public List<Book> getListOfBooksByNamePageable(HttpServletResponse response, @PathVariable Integer page) {
         final boolean useCache = redisShortCircuit.isOpen();
         response.addHeader(ApiConstants.X_TOTAL_COUNT_HEADER,

@@ -22,7 +22,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -30,14 +29,12 @@ import java.util.List;
  * CRUD Access to author data.
  */
 @Service
-@Transactional
 public interface BookAuthorRepository extends JpaRepository<Author, String>,
         JpaSpecificationExecutor<Author> {
 
     /**
      * @return list of  all authors
      */
-    @Transactional(readOnly = true)
     @Override
     @Cacheable("allAuthors")
     List<Author> findAll();
@@ -45,7 +42,6 @@ public interface BookAuthorRepository extends JpaRepository<Author, String>,
     /**
      * @return list of  all authors matching the search criteria
      */
-    @Transactional(readOnly = true)
     @Override
         @Cacheable("authorsBySpec")
     List<Author> findAll(final Specification<Author> spec);
@@ -53,7 +49,6 @@ public interface BookAuthorRepository extends JpaRepository<Author, String>,
     /**
      * @return list of  all authors
      */
-    @Transactional(readOnly = true)
     @Override
     @Cacheable("authorsBySort")
     List<Author> findAll(Sort sort);
