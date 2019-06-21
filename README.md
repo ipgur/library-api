@@ -6,6 +6,7 @@ Demo available at: http://strumskiapi-env.ptjyutvivi.eu-central-1.elasticbeansta
 Name     | Status |
 -------- | ------ |
 Build    | [![CircleCI](https://circleci.com/gh/ipgur/library-api.svg?style=svg)](https://circleci.com/gh/ipgur/library-api) |
+Coverage | [![codecov](https://codecov.io/gh/ipgur/library-api/branch/master/graph/badge.svg)](https://codecov.io/gh/ipgur/library-api) |
 BetterCode    | [![BCH compliance](https://bettercodehub.com/edge/badge/ipgur/library-api?branch=master)](https://bettercodehub.com/)|
 
 
