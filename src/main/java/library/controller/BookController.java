@@ -17,10 +17,10 @@ package library.controller;
 
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
-import library.configuration.ApiConfiguration;
-import library.database.BookRepository;
+import library.configuration.ApiConstants;
+import library.repositories.BookRepository;
 import library.exceptions.InternalServerError;
-import library.model.Book;
+import library.entities.Book;
 import library.tools.FileTools;
 import library.tools.ShortCircuit;
 import net.kaczmarzyk.spring.data.jpa.domain.LikeIgnoreCase;
@@ -68,8 +68,8 @@ public class BookController {
      * @return provide list of books.
      */
     @GetMapping(value = "/books",
-            params = {ApiConfiguration.SORT_BY_TITLE})
-    public List<Book> getListOfBooksBySpec(@Spec(path = ApiConfiguration.SORT_BY_TITLE, spec = LikeIgnoreCase.class)
+            params = {ApiConstants.SORT_BY_TITLE})
+    public List<Book> getListOfBooksBySpec(@Spec(path = ApiConstants.SORT_BY_TITLE, spec = LikeIgnoreCase.class)
                                                final Specification<Book> spec) {
         return bookRepository.findAll(spec);
     }
@@ -85,7 +85,7 @@ public class BookController {
     public String renderHtml() {
         String content = null;
         try {
-            content = FileTools.readResourceFile(ApiConfiguration.BOOK_HTML);
+            content = FileTools.readResourceFile(ApiConstants.BOOK_HTML);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -109,12 +109,12 @@ public class BookController {
     @GetMapping(value = "/books/{page}")
     public List<Book> getListOfBooksByNamePageable(HttpServletResponse response, @PathVariable Integer page) {
         final boolean useCache = redisShortCircuit.isOpen();
-        response.addHeader(ApiConfiguration.X_TOTAL_COUNT_HEADER,
+        response.addHeader(ApiConstants.X_TOTAL_COUNT_HEADER,
                 String.valueOf(useCache ? bookRepository.countAndCache() : bookRepository.countNoCache()));
-        return useCache ? bookRepository.findAllAndCache(PageRequest.of(page, ApiConfiguration.PAGE_SIZE,
-                Sort.by(ApiConfiguration.SORT_BY_TITLE))).getContent() :
-                bookRepository.findAllNoCache(PageRequest.of(page, ApiConfiguration.PAGE_SIZE,
-                        Sort.by(ApiConfiguration.SORT_BY_TITLE))).getContent();
+        return useCache ? bookRepository.findAllAndCache(PageRequest.of(page, ApiConstants.PAGE_SIZE,
+                Sort.by(ApiConstants.SORT_BY_TITLE))).getContent() :
+                bookRepository.findAllNoCache(PageRequest.of(page, ApiConstants.PAGE_SIZE,
+                        Sort.by(ApiConstants.SORT_BY_TITLE))).getContent();
     }
 
 }

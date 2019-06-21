@@ -17,10 +17,10 @@ package library.controller;
 
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
-import library.configuration.ApiConfiguration;
-import library.database.BookAuthorRepository;
+import library.configuration.ApiConstants;
+import library.repositories.BookAuthorRepository;
 import library.exceptions.InternalServerError;
-import library.model.Author;
+import library.entities.Author;
 import library.tools.FileTools;
 import net.kaczmarzyk.spring.data.jpa.domain.LikeIgnoreCase;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
@@ -52,20 +52,7 @@ public class BookAuthorController {
     @Timed(name = "getAllAuthors")
     @Metered
     public List<Author> getListOfAuthors() {
-        return repository.findAll(Sort.by(ApiConfiguration.SORT_BY_NAME));
-    }
-
-    /**
-     * Provide list of authors filtered by name containing search string.
-     *
-     * @param spec the search spec
-     * @return provide list of authors.
-     */
-    @GetMapping(value = "/books/authors",
-            params = {ApiConfiguration.SORT_BY_NAME})
-    public List<Author> getListOfAuthorsBySpec(@Spec(path = ApiConfiguration.SORT_BY_NAME, spec = LikeIgnoreCase.class)
-            final Specification<Author> spec) {
-        return repository.findAll(spec);
+        return repository.findAll(Sort.by(ApiConstants.SORT_BY_NAME));
     }
 
     /**
@@ -79,7 +66,7 @@ public class BookAuthorController {
     public String renderHtml() {
         String content = null;
         try {
-            content = FileTools.readResourceFile(ApiConfiguration.AUTHORS_HTML);
+            content = FileTools.readResourceFile(ApiConstants.AUTHORS_HTML);
         } catch (IOException e) {
             e.printStackTrace();
         }

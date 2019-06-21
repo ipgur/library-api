@@ -36,21 +36,6 @@ public class ApiSecretsConfigBean {
 
     private final static Logger logger = LoggerFactory.getLogger(ApiSecretsConfigBean.class);
 
-    /**
-     * provides the data source based with username and password retrieved from AWS Secret Manager Store if configured
-     * @return a data source to be used to connect to the db
-     */
-    @Bean
-    public DataSource provideDataSource() {
-        return DataSourceBuilder
-                .create()
-                .username(mysqlUsername)
-                .password(mysqlPassword)
-                .url("jdbc:mysql://strumski.com:3306/avatart_library")
-                .driverClassName("com.mysql.jdbc.Driver")
-                .build();
-    }
-
     // dependency injection of the secret provider
     @Autowired
     private SecretProvider secretProvider;
@@ -70,6 +55,16 @@ public class ApiSecretsConfigBean {
     // db username
     @Value("${spring.datasource.username}")
     private String mysqlUsername;
+
+    @Bean(name = "mysqlPassword")
+    String providesMysqlPassword() {
+        return mysqlPassword;
+    }
+
+    @Bean(name = "mysqlUsername")
+    String providesMysqlUsername() {
+        return mysqlUsername;
+    }
 
     /**
      * loads the secrets using the injected provider

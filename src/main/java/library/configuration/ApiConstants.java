@@ -18,12 +18,12 @@ package library.configuration;
 /**
  * Configuration class containing some constant for API related flows
  */
-public class ApiConfiguration {
+public class ApiConstants {
 
     /**
      * private c'tor
      */
-    private ApiConfiguration() {
+    private ApiConstants() {
         throw new AssertionError("no instances allowed");
     }
 

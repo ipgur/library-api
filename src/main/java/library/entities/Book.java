@@ -13,28 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package library.model;
+package library.entities;
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
- * Entity class representing author
+ * Entity class representing Book
  */
 @Entity
-@Table(name = "authors")
+@Table(name = "books")
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 @Builder
-public class Author implements Serializable {
+@Data
+public class Book implements Serializable {
+
     /**
      * version of class.
      */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * title of the book
+     */
+    private String title;
+
+    /**
+     * description of the book
+     */
+    private String description;
 
     /**
      * id of the author
@@ -45,18 +60,21 @@ public class Author implements Serializable {
     private Integer id;
 
     /**
-     * name of the author
+     * author of the book
      */
-    @NotNull
-    private String name;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "author", referencedColumnName = "id")
+    private Author author;
 
     /**
-     * birthplace
+     * number of times the book was read
      */
-    private String birthplace;
+    @JsonProperty("number_read")
+    private int numberRead;
 
     /**
-     * short bio
+     * number of times the book was opened
      */
-    private String description;
+    @JsonProperty("number_opened")
+    private int numberOpened;
 }
