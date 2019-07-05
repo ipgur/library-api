@@ -20,6 +20,7 @@ import com.amazonaws.services.cloudwatch.AmazonCloudWatchAsyncClientBuilder;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.ScheduledReporter;
 import io.github.azagniotov.metrics.reporter.cloudwatch.CloudWatchReporter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -32,11 +33,6 @@ public class MetricsCloudWatchReporterProvider implements MetricsReporterProvide
     @Value("${monitoring.metrics.reporter.cloudwatch.namespace:strumski}")
     private String cloudWatchNamespace;
 
-    // an async cloud watch client
-    private static final AmazonCloudWatchAsync amazonCloudWatchAsync =
-            AmazonCloudWatchAsyncClientBuilder
-                    .standard()
-                    .build();
     /**
      *
      * @param metricRegistry the default metrics registry
@@ -44,6 +40,10 @@ public class MetricsCloudWatchReporterProvider implements MetricsReporterProvide
      */
     @Override
     public ScheduledReporter createReporter(MetricRegistry metricRegistry) {
+        final AmazonCloudWatchAsync amazonCloudWatchAsync = AmazonCloudWatchAsyncClientBuilder
+                .standard()
+                .build();
+
         return CloudWatchReporter.forRegistry(metricRegistry, amazonCloudWatchAsync, cloudWatchNamespace)
                 .build();
 

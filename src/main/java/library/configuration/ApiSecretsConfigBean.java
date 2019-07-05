@@ -45,7 +45,7 @@ public class ApiSecretsConfigBean {
     private boolean enabled;
 
     // keygroup for the secrets
-    @Value("${api.secrets.aws.keyGroup}")
+    @Value("${api.secrets.aws.keyGroup:prod_strumski}")
     private String keyGroup;
 
     // db password
