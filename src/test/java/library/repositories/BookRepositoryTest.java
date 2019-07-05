@@ -75,13 +75,13 @@ public class BookRepositoryTest {
 
     @Test
     public void testGetAllBooksWithPagination() {
-        List<Book> page1 = bookRepository.findAllNoCache(PageRequest.of(0, 2,
+        List<Book> page1 = bookRepository.findAll(PageRequest.of(0, 2,
                 Sort.by(ApiConstants.SORT_BY_TITLE))).getContent();
         assertThat(page1.size(), is(2));
-        List<Book> page2 = bookRepository.findAllNoCache(PageRequest.of(1, 2,
+        List<Book> page2 = bookRepository.findAll(PageRequest.of(1, 2,
                 Sort.by(ApiConstants.SORT_BY_TITLE))).getContent();
         assertThat(page2.size(), is(2));
-        List<Book> page3 = bookRepository.findAllNoCache(PageRequest.of(2, 2,
+        List<Book> page3 = bookRepository.findAll(PageRequest.of(2, 2,
                 Sort.by(ApiConstants.SORT_BY_TITLE))).getContent();
         assertThat(page3.size(), is(0));
     }

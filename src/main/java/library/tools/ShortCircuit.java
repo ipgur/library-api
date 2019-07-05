@@ -46,7 +46,7 @@ public class ShortCircuit {
         errors.incrementAndGet();
     }
 
-    public boolean isOpen() {
+    public boolean isClosed() {
         return errors.get() < maxNumberErrors;
     }
 

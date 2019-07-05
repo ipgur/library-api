@@ -21,6 +21,7 @@ import library.configuration.ApiConstants;
 import library.repositories.BookRepository;
 import library.exceptions.InternalServerError;
 import library.entities.Book;
+import library.services.BookService;
 import library.tools.FileTools;
 import library.tools.ShortCircuit;
 import net.kaczmarzyk.spring.data.jpa.domain.LikeIgnoreCase;
@@ -50,7 +51,7 @@ public class BookController {
     private transient ShortCircuit redisShortCircuit;
 
     @Autowired
-    private transient BookRepository bookRepository;
+    private transient BookService bookService;
 
     /**
      * Provide list of books.
@@ -59,7 +60,7 @@ public class BookController {
      */
     @GetMapping(value = "/books")
     public List<Book> getListOfBooks() {
-        return bookRepository.findAll();
+        return bookService.getAll();
     }
 
     /**
@@ -72,7 +73,7 @@ public class BookController {
             params = {ApiConstants.SORT_BY_TITLE})
     public List<Book> getListOfBooksBySpec(@Spec(path = ApiConstants.SORT_BY_TITLE, spec = LikeIgnoreCase.class)
                                                final Specification<Book> spec) {
-        return bookRepository.findAll(spec);
+        return bookService.getAll(spec);
     }
 
     /**
@@ -110,13 +111,12 @@ public class BookController {
     @GetMapping(value = "/books/{page}")
     @Transactional(readOnly = true)
     public List<Book> getListOfBooksByNamePageable(HttpServletResponse response, @PathVariable Integer page) {
-        final boolean useCache = redisShortCircuit.isOpen();
+        final boolean useCache = redisShortCircuit.isClosed();
+        System.out.println("Use cache is " + useCache);
         response.addHeader(ApiConstants.X_TOTAL_COUNT_HEADER,
-                String.valueOf(useCache ? bookRepository.countAndCache() : bookRepository.countNoCache()));
-        return useCache ? bookRepository.findAllAndCache(PageRequest.of(page, ApiConstants.PAGE_SIZE,
-                Sort.by(ApiConstants.SORT_BY_TITLE))).getContent() :
-                bookRepository.findAllNoCache(PageRequest.of(page, ApiConstants.PAGE_SIZE,
-                        Sort.by(ApiConstants.SORT_BY_TITLE))).getContent();
+                String.valueOf(bookService.getCount()));
+        return bookService.getBooksPageable(PageRequest.of(page, ApiConstants.PAGE_SIZE,
+                Sort.by(ApiConstants.SORT_BY_TITLE)));
     }
 
 }

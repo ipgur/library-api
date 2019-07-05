@@ -29,41 +29,16 @@ import java.util.List;
  */
 public interface BookRepository extends JpaRepository<Book, Integer>,
         JpaSpecificationExecutor<Book> {
-    /**
-     * @return all of the books
-     */
+
     @Override
     List<Book> findAll();
 
-    /**
-     * @param spec the search spec
-     * @return list of books matching the searching criteria
-     */
     @Override
-    @Cacheable("booksBySpec")
     List<Book> findAll(final Specification<Book> spec);
 
     @Override
     Page<Book> findAll(org.springframework.data.domain.Pageable pageable);
 
-    @Cacheable("booksByPage")
-    default Page<Book> findAllAndCache(org.springframework.data.domain.Pageable pageable) {
-        return findAll(pageable);
-    }
-
-    default Page<Book> findAllNoCache(org.springframework.data.domain.Pageable pageable) {
-        return findAll(pageable);
-    }
-
     @Override
     long count();
-
-    @Cacheable("booksCount")
-    default long countAndCache() {
-        return count();
-    }
-
-    default long countNoCache() {
-        return count();
-    }
 }
