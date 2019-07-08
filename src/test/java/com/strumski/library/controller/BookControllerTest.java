@@ -10,13 +10,16 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
@@ -42,6 +45,9 @@ public class BookControllerTest {
     }
 
     @Autowired
+    private BookController bookController;
+
+    @Autowired
     MockMvc mvc;
 
     @MockBean
@@ -65,6 +71,17 @@ public class BookControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(handler().handlerType(BookController.class))
                 .andExpect(handler().methodName("renderHtml"));
+    }
+
+    @Test
+    @DirtiesContext
+    public void testRenderHTMLInternalError() throws Exception {
+        ReflectionTestUtils.setField(bookController, "booksHTMLPath", "non_existing");
+
+        mvc.perform(get("/books")
+                .accept(MediaType.TEXT_HTML)
+                .contentType(MediaType.TEXT_HTML))
+                .andExpect(status().is5xxServerError());
     }
 
 

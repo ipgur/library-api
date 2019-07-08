@@ -17,6 +17,7 @@ package com.strumski.library.repositories;
 
 import com.strumski.library.entities.Book;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -36,7 +37,7 @@ public interface BookRepository extends JpaRepository<Book, Integer>,
     List<Book> findAll(final Specification<Book> spec);
 
     @Override
-    Page<Book> findAll(org.springframework.data.domain.Pageable pageable);
+    Page<Book> findAll(Pageable pageable);
 
     @Override
     long count();

@@ -27,6 +27,7 @@ import net.kaczmarzyk.spring.data.jpa.domain.LikeIgnoreCase;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -49,6 +50,9 @@ public class BookController {
     @Autowired
     private transient BookService bookService;
 
+    @Value("${static.html.books:books.html}")
+    private String booksHTMLPath;
+
     /**
      * Provide list of books.
      *
@@ -70,12 +74,11 @@ public class BookController {
     public String renderHtml() {
         String content = null;
         try {
-            content = FileTools.readResourceFile(ApiConstants.BOOK_HTML);
+            content = FileTools.readResourceFile(booksHTMLPath);
         } catch (IOException e) {
             e.printStackTrace();
         }
         if (content != null) {
-
             return content;
         }
 

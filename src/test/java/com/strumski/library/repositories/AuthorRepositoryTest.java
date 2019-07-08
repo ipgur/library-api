@@ -39,6 +39,7 @@ import static org.junit.Assert.assertThat;
 @TestPropertySource(locations="classpath:application.properties")
 @ActiveProfiles("test")
 public class AuthorRepositoryTest {
+
     @Autowired
     private BookAuthorRepository authorRepository;
 
