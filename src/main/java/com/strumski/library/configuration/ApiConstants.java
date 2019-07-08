@@ -46,14 +46,4 @@ public class ApiConstants {
      * name of the name column
      */
     public static final String SORT_BY_NAME = "name";
-
-    /**
-     * name of the authors.html file
-     */
-    public static final String AUTHORS_HTML = "authors.html";
-
-    /**
-     * name of the book.html file
-     */
-    public static final String BOOK_HTML = "books.html";
 }

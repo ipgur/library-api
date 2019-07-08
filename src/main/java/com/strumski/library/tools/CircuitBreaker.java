@@ -42,8 +42,9 @@ public class CircuitBreaker {
         return new ShortCircuitBuilder();
     }
 
-    public void incrementErrors() {
+    public CircuitBreaker incrementErrors() {
         errors.incrementAndGet();
+        return this;
     }
 
     public boolean isClosed() {

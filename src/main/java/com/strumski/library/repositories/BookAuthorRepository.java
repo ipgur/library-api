@@ -21,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,7 +29,7 @@ import java.util.List;
 /**
  * CRUD Access to author data.
  */
-@Service
+@Repository
 public interface BookAuthorRepository extends JpaRepository<Author, String>,
         JpaSpecificationExecutor<Author> {
 
@@ -36,21 +37,12 @@ public interface BookAuthorRepository extends JpaRepository<Author, String>,
      * @return list of  all authors
      */
     @Override
-    @Cacheable("allAuthors")
     List<Author> findAll();
-
-    /**
-     * @return list of  all authors matching the search criteria
-     */
-    @Override
-        @Cacheable("authorsBySpec")
-    List<Author> findAll(final Specification<Author> spec);
 
     /**
      * @return list of  all authors
      */
     @Override
-    @Cacheable("authorsBySort")
     List<Author> findAll(Sort sort);
 }
 

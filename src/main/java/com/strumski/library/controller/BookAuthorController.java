@@ -21,8 +21,10 @@ import com.strumski.library.configuration.ApiConstants;
 import com.strumski.library.exceptions.InternalServerError;
 import com.strumski.library.repositories.BookAuthorRepository;
 import com.strumski.library.entities.Author;
+import com.strumski.library.services.BookAuthorService;
 import com.strumski.library.tools.FileTools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,7 +40,10 @@ import java.util.List;
 public class BookAuthorController {
 
     @Autowired
-    private transient BookAuthorRepository repository;
+    private transient BookAuthorService service;
+
+    @Value("${static.html.authors:authors.html}")
+    private String authorsHTMLPath;
 
     /**
      * Provide list of authors.
@@ -49,7 +54,7 @@ public class BookAuthorController {
     @Timed(name = "getAllAuthors")
     @Metered
     public List<Author> getListOfAuthors() {
-        return repository.findAll(Sort.by(ApiConstants.SORT_BY_NAME));
+        return service.getAuthors(Sort.by(ApiConstants.SORT_BY_NAME));
     }
 
     /**
@@ -63,7 +68,7 @@ public class BookAuthorController {
     public String renderHtml() {
         String content = null;
         try {
-            content = FileTools.readResourceFile(ApiConstants.AUTHORS_HTML);
+            content = FileTools.readResourceFile(authorsHTMLPath);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -21,20 +21,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * CRUD Access to book data.
  */
+@Repository
 public interface BookRepository extends JpaRepository<Book, Integer>,
         JpaSpecificationExecutor<Book> {
 
     @Override
     List<Book> findAll();
-
-    @Override
-    List<Book> findAll(final Specification<Book> spec);
 
     @Override
     Page<Book> findAll(Pageable pageable);

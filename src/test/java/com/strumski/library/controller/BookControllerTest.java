@@ -84,7 +84,6 @@ public class BookControllerTest {
                 .andExpect(status().is5xxServerError());
     }
 
-
     @Test
     public void getListOfBooksByNamePageable() throws Exception {
         given(service.getBooks(PageRequest.of(1, ApiConstants.PAGE_SIZE, Sort.by(ApiConstants.SORT_BY_TITLE))))
