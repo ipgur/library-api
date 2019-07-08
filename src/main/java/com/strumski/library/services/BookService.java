@@ -22,7 +22,7 @@ public class BookService {
     public CircuitBreaker circuitBreaker;
 
     @Cacheable(value = "booksByPage", condition = "#root.target.circuitBreaker.isClosed() == true")
-    public List<Book> getBooksPageable(Pageable pageable) {
+    public List<Book> getBooks(Pageable pageable) {
         return dao.findAll(pageable).getContent();
     }
 
@@ -34,9 +34,5 @@ public class BookService {
     @Cacheable(value = "booksCount", condition = "#root.target.circuitBreaker.isClosed() == true")
     public long getCount() {
         return dao.count();
-    }
-    @Cacheable(value = "booksSpec", condition = "#root.target.circuitBreaker.isClosed() == true")
-    public List<Book> getAll(Specification<Book> spec) {
-        return dao.findAll(spec);
     }
 }

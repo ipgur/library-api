@@ -1,55 +1,57 @@
 package com.strumski.library.services;
 
 import com.strumski.library.repositories.BookRepository;
-import com.strumski.library.util.DataSourceTestConfig;
-import com.strumski.library.configuration.caching.CacheConfig;
-import com.strumski.library.configuration.caching.CustomCacheErrorHandler;
-import com.strumski.library.configuration.persistence.PersistenceConfiguration;
 import com.strumski.library.entities.Book;
 import com.strumski.library.tools.CircuitBreaker;
+import com.strumski.library.util.BookFactory;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.concurrent.ConcurrentMapCache;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.*;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ConcurrentMap;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@Transactional
-@ContextConfiguration(classes = {BookServiceTest.Config.class, PersistenceConfiguration.class, DataSourceTestConfig.class,
-        BookService.class, CacheConfig.class, CustomCacheErrorHandler.class})
+@ContextConfiguration(classes = {BookServiceTest.Config.class, BookService.class})
 @TestPropertySource(locations="classpath:application.properties")
 @ActiveProfiles("test")
 public class BookServiceTest {
 
     @Configuration
+    @EnableCaching
     static class Config {
+
         @Bean(name = "CacheCircuitBreaker")
         public CircuitBreaker providesSimpleCacheShortCircuit() {
             return Mockito.mock(CircuitBreaker.class);
         }
 
         @Bean
+        @Primary
+        public BookRepository provideDAO() {
+            return Mockito.mock(BookRepository.class);
+        }
+
+        @Bean
         public CacheManager cacheManager() {
             System.out.println("Creating cache manager....");
-            return new ConcurrentMapCacheManager("booksCount", "booksAll", "booksCount", "booksSpec");
+            return new ConcurrentMapCacheManager("booksCount", "booksAll", "booksByPage", "booksSpec");
         }
     }
 
@@ -57,36 +59,81 @@ public class BookServiceTest {
     private BookService bookService;
 
     @Autowired
-    private ApplicationContext applicationContext;
-
-    @Autowired
     private CircuitBreaker circuitBreaker;
 
-    @Test
-    public void getAll() {
+    @Autowired
+    private BookRepository dao;
+
+    @Before
+    public void setUp() {
         Mockito.when(circuitBreaker.isClosed()).thenReturn(true);
-        List<Book> books = bookService.getAll();
-        assertEquals(4, books.size());
-        CacheManager cacheManager = (CacheManager) applicationContext.getBean("cacheManager");
-        Cache cache = cacheManager.getCache("booksAll");
-        assertNotNull(cache);
-        ConcurrentMap<Object, Object> nativeCache = (ConcurrentMap<Object, Object>) cache.getNativeCache();
-        assertEquals(1, nativeCache.size());
+        Mockito.when(dao.findAll()).thenReturn(Arrays.asList(
+                BookFactory.generateRandomBook(), BookFactory.generateRandomBook(), BookFactory.generateRandomBook()
+        ));
+        Mockito.when(dao.findAll(PageRequest.of(1, 2))).thenReturn(new PageImpl<>(Arrays.asList(
+                BookFactory.generateRandomBook(), BookFactory.generateRandomBook())));
+        Mockito.when(dao.count()).thenReturn((long) 3);
     }
 
     @Test
+    @DirtiesContext
+    public void getAll() {
+        List<Book> books = bookService.getAll();
+        assertEquals(3, books.size());
+        // call it one more time, we should get it from the cache now
+        bookService.getAll();
+        Mockito.verify(dao, Mockito.times(1)).findAll();
+    }
+
+    @Test
+    @DirtiesContext
     public void getAllCircuitOpen() {
         Mockito.when(circuitBreaker.isClosed()).thenReturn(false);
         List<Book> books = bookService.getAll();
-        assertEquals(4, books.size());
-        CacheManager cacheManager = (CacheManager) applicationContext.getBean("cacheManager");
-        Cache cache = cacheManager.getCache("booksAll");
-        assertNotNull(cache);
-        ConcurrentMap<Object, Object> nativeCache = (ConcurrentMap<Object, Object>) cache.getNativeCache();
-        assertEquals(0, nativeCache.size());
+        assertEquals(3, books.size());
+        bookService.getAll();
+        Mockito.verify(dao, Mockito.times(2)).findAll();
     }
 
     @Test
-    public void getCount() {
+    @DirtiesContext
+    public void getPage() {
+        List<Book> books = bookService.getBooks(PageRequest.of(1, 2));
+        assertEquals(2, books.size());
+        // call it one more time, we should get it from the cache now
+        bookService.getBooks(PageRequest.of(1, 2));
+        Mockito.verify(dao, Mockito.times(1)).findAll(Mockito.any(PageRequest.class));
+    }
+
+    @Test
+    @DirtiesContext
+    public void getPageCircuitOpen() {
+        Mockito.when(circuitBreaker.isClosed()).thenReturn(false);
+        List<Book> books = bookService.getBooks(PageRequest.of(1, 2));
+        assertEquals(2, books.size());
+        // call it one more time, we should get it from the cache now
+        bookService.getBooks(PageRequest.of(1, 2));
+        Mockito.verify(dao, Mockito.times(2)).findAll(Mockito.any(PageRequest.class));
+    }
+
+    @Test
+    @DirtiesContext
+    public void booksCount() {
+        final long count = bookService.getCount();
+        assertEquals(3, count);
+        // call it one more time, we should get it from the cache now
+        bookService.getCount();
+        Mockito.verify(dao, Mockito.times(1)).count();
+    }
+
+    @Test
+    @DirtiesContext
+    public void booksCountCircuitOpen() {
+        Mockito.when(circuitBreaker.isClosed()).thenReturn(false);
+        final long count = bookService.getCount();
+        assertEquals(3, count);
+        // call it one more time, we should get it from the cache now
+        bookService.getCount();
+        Mockito.verify(dao, Mockito.times(2)).count();
     }
 }

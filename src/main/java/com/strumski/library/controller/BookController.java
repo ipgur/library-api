@@ -60,19 +60,6 @@ public class BookController {
     }
 
     /**
-     * Provide list of books filtered by name containing search string.
-     *
-     * @param spec the search spec
-     * @return provide list of books.
-     */
-    @GetMapping(value = "/books",
-            params = {ApiConstants.SORT_BY_TITLE})
-    public List<Book> getListOfBooksBySpec(@Spec(path = ApiConstants.SORT_BY_TITLE, spec = LikeIgnoreCase.class)
-                                               final Specification<Book> spec) {
-        return bookService.getAll(spec);
-    }
-
-    /**
      * Provide list of books as HTML.
      *
      * @return provide list of books rendered into HTML.
@@ -109,7 +96,7 @@ public class BookController {
     public List<Book> getListOfBooksByNamePageable(HttpServletResponse response, @PathVariable Integer page) {
         response.addHeader(ApiConstants.X_TOTAL_COUNT_HEADER,
                 String.valueOf(bookService.getCount()));
-        return bookService.getBooksPageable(PageRequest.of(page, ApiConstants.PAGE_SIZE,
+        return bookService.getBooks(PageRequest.of(page, ApiConstants.PAGE_SIZE,
                 Sort.by(ApiConstants.SORT_BY_TITLE)));
     }
 

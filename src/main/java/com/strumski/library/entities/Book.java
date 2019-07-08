@@ -36,6 +36,9 @@ import java.io.Serializable;
 @Data
 public class Book implements Serializable {
 
+    public Book(String title) {
+        this.title = title;
+    }
     /**
      * version of class.
      */
@@ -79,4 +82,5 @@ public class Book implements Serializable {
     @JsonProperty("number_opened")
     @Column(name="number_opened")
     private int numberOpened;
+
 }
