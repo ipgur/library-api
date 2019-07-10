@@ -47,11 +47,11 @@ public class ApiSecretsConfigBean {
     private String keyGroup;
 
     // db password
-    @Value("${spring.datasource.password}")
+    @Value("${spring.datasource.password:''}")
     private String daoPassword;
 
     // db username
-    @Value("${spring.datasource.username}")
+    @Value("${spring.datasource.username:''}")
     private String daoUsername;
 
     @Bean(name = "daoPassword")
