@@ -15,7 +15,7 @@
  */
 package com.strumski.library.configuration;
 
-import com.strumski.library.configuration.secrets.SecretProvider;
+import com.strumski.library.secrets.SecretProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,20 +48,20 @@ public class ApiSecretsConfigBean {
 
     // db password
     @Value("${spring.datasource.password}")
-    private String mysqlPassword;
+    private String daoPassword;
 
     // db username
     @Value("${spring.datasource.username}")
-    private String mysqlUsername;
+    private String daoUsername;
 
-    @Bean(name = "mysqlPassword")
-    String providesMysqlPassword() {
-        return mysqlPassword;
+    @Bean(name = "daoPassword")
+    String providesDaoPassword() {
+        return daoPassword;
     }
 
-    @Bean(name = "mysqlUsername")
-    String providesMysqlUsername() {
-        return mysqlUsername;
+    @Bean(name = "daoUsername")
+    String providesDaoUsername() {
+        return daoUsername;
     }
 
     /**
@@ -89,9 +89,9 @@ public class ApiSecretsConfigBean {
             }
             logger.info("secret of group/key {}/{} value present.", keyGroup, key);
             if (key.endsWith("prod_db_username")) {
-                mysqlUsername = value;
+                daoUsername = value;
             } else if (key.endsWith("prod_db_password")) {
-                mysqlPassword = value;
+                daoPassword = value;
             } else {
                 logger.info("secret of group/key {}/{} could not be assigned to any found variable!", keyGroup, key);
             }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.strumski.library.configuration.secrets;
+package com.strumski.library.secrets;
 
 import java.util.List;
 import java.util.function.BiConsumer;

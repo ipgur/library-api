@@ -15,13 +15,15 @@
  */
 package com.strumski.library.repositories;
 
-import com.strumski.library.configuration.ApiConstants;
+import com.strumski.library.ApiConstants;
+import com.strumski.library.configuration.persistence.DataSourceConfiguration;
 import com.strumski.library.configuration.persistence.PersistenceConfiguration;
 import com.strumski.library.entities.Book;
-import com.strumski.library.util.DataSourceTestConfig;
+import com.strumski.library.util.DataSourceTestCredentials;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
@@ -33,15 +35,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @Transactional
-@ContextConfiguration(classes = {PersistenceConfiguration.class, DataSourceTestConfig.class})
+@ContextConfiguration(classes = {PersistenceConfiguration.class, DataSourceConfiguration.class,
+        DataSourceTestCredentials.class})
 @TestPropertySource(locations="classpath:application.properties")
+@AutoConfigureTestDatabase
 @ActiveProfiles("test")
 public class BookRepositoryTest {
+
     @Autowired
     private BookRepository bookRepository;
 

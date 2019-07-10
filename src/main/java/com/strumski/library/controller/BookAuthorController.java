@@ -17,9 +17,8 @@ package com.strumski.library.controller;
 
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
-import com.strumski.library.configuration.ApiConstants;
+import com.strumski.library.ApiConstants;
 import com.strumski.library.exceptions.InternalServerError;
-import com.strumski.library.repositories.BookAuthorRepository;
 import com.strumski.library.entities.Author;
 import com.strumski.library.services.BookAuthorService;
 import com.strumski.library.tools.FileTools;

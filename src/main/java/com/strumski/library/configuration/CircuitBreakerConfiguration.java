@@ -19,6 +19,7 @@ import com.strumski.library.tools.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class CircuitBreakerConfiguration {
@@ -26,7 +27,6 @@ public class CircuitBreakerConfiguration {
     @Bean(name="CacheCircuitBreaker")
     public CircuitBreaker providesRedisShortCircuit(@Value("${redis.short_circuit.max_errors:6}") int maxErrors,
                                                     @Value("${redis.short_circuit.time_interval:120}") int timeInterval) {
-        System.out.println("maxErrors: " + maxErrors);
         return new CircuitBreaker.ShortCircuitBuilder().maxNumberErrors(maxErrors).timeWindowSec(timeInterval).build();
     }
 }

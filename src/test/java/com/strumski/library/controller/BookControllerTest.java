@@ -1,22 +1,18 @@
 package com.strumski.library.controller;
 
-import com.strumski.library.configuration.ApiConstants;
+import com.strumski.library.ApiConstants;
 import com.strumski.library.services.BookService;
-import com.strumski.library.tools.CircuitBreaker;
-import com.strumski.library.util.BookFactory;
+import com.strumski.library.util.BookAuthorFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -32,17 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(BookController.class)
-@ContextConfiguration(classes = {BookControllerTest.Config.class, BookController.class})
+@ContextConfiguration(classes = {BookController.class})
+@ActiveProfiles("test")
+@EnableWebMvc
 public class BookControllerTest {
-
-    @Configuration
-    @EnableWebMvc
-    static class Config {
-        @Bean(name = "CacheCircuitBreaker")
-        public CircuitBreaker providesSimpleCacheShortCircuit() {
-            return Mockito.mock(CircuitBreaker.class);
-        }
-    }
 
     @Autowired
     private BookController bookController;
@@ -55,8 +44,8 @@ public class BookControllerTest {
 
     @Test
     public void getListOfBooks() throws Exception {
-        given(service.getAll()).willReturn(Arrays.asList(BookFactory.generateRandomBook(),
-                BookFactory.generateRandomBook()));
+        given(service.getAll()).willReturn(Arrays.asList(BookAuthorFactory.generateRandomBook(),
+                BookAuthorFactory.generateRandomBook()));
         mvc.perform(get("/books")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -87,8 +76,8 @@ public class BookControllerTest {
     @Test
     public void getListOfBooksByNamePageable() throws Exception {
         given(service.getBooks(PageRequest.of(1, ApiConstants.PAGE_SIZE, Sort.by(ApiConstants.SORT_BY_TITLE))))
-                .willReturn(Arrays.asList(BookFactory.generateRandomBook(),
-                BookFactory.generateRandomBook()));
+                .willReturn(Arrays.asList(BookAuthorFactory.generateRandomBook(),
+                BookAuthorFactory.generateRandomBook()));
         given(service.getCount()).willReturn((long) 2);
 
         mvc.perform(get("/books/1")

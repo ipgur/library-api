@@ -15,12 +15,14 @@
  */
 package com.strumski.library.repositories;
 
+import com.strumski.library.configuration.persistence.DataSourceConfiguration;
 import com.strumski.library.configuration.persistence.PersistenceConfiguration;
 import com.strumski.library.entities.Author;
-import com.strumski.library.util.DataSourceTestConfig;
+import com.strumski.library.util.DataSourceTestCredentials;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -35,9 +37,11 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @Transactional
-@ContextConfiguration(classes = {PersistenceConfiguration.class, DataSourceTestConfig.class})
+@ContextConfiguration(classes = {PersistenceConfiguration.class, DataSourceConfiguration.class,
+        DataSourceTestCredentials.class})
 @TestPropertySource(locations="classpath:application.properties")
 @ActiveProfiles("test")
+@AutoConfigureTestDatabase
 public class AuthorRepositoryTest {
 
     @Autowired

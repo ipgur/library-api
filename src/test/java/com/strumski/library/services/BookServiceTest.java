@@ -3,18 +3,18 @@ package com.strumski.library.services;
 import com.strumski.library.repositories.BookRepository;
 import com.strumski.library.entities.Book;
 import com.strumski.library.tools.CircuitBreaker;
-import com.strumski.library.util.BookFactory;
+import com.strumski.library.util.BookAuthorFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {BookServiceTest.Config.class, BookService.class})
@@ -33,20 +34,16 @@ import static org.junit.Assert.*;
 @ActiveProfiles("test")
 public class BookServiceTest {
 
+
+    @MockBean(name = "CacheCircuitBreaker")
+    private CircuitBreaker circuitBreaker;
+
+    @MockBean
+    private BookRepository dao;
+
     @Configuration
     @EnableCaching
     static class Config {
-
-        @Bean(name = "CacheCircuitBreaker")
-        public CircuitBreaker providesSimpleCacheShortCircuit() {
-            return Mockito.mock(CircuitBreaker.class);
-        }
-
-        @Bean
-        @Primary
-        public BookRepository provideDAO() {
-            return Mockito.mock(BookRepository.class);
-        }
 
         @Bean
         public CacheManager cacheManager() {
@@ -58,21 +55,15 @@ public class BookServiceTest {
     @Autowired
     private BookService bookService;
 
-    @Autowired
-    private CircuitBreaker circuitBreaker;
-
-    @Autowired
-    private BookRepository dao;
-
     @Before
     public void setUp() {
-        Mockito.when(circuitBreaker.isClosed()).thenReturn(true);
-        Mockito.when(dao.findAll()).thenReturn(Arrays.asList(
-                BookFactory.generateRandomBook(), BookFactory.generateRandomBook(), BookFactory.generateRandomBook()
+        given(circuitBreaker.isClosed()).willReturn(true);
+        given(dao.findAll()).willReturn(Arrays.asList(
+                BookAuthorFactory.generateRandomBook(), BookAuthorFactory.generateRandomBook(), BookAuthorFactory.generateRandomBook()
         ));
-        Mockito.when(dao.findAll(PageRequest.of(1, 2))).thenReturn(new PageImpl<>(Arrays.asList(
-                BookFactory.generateRandomBook(), BookFactory.generateRandomBook())));
-        Mockito.when(dao.count()).thenReturn((long) 3);
+        given(dao.findAll(PageRequest.of(1, 2))).willReturn(new PageImpl<>(Arrays.asList(
+                BookAuthorFactory.generateRandomBook(), BookAuthorFactory.generateRandomBook())));
+        given(dao.count()).willReturn((long) 3);
     }
 
     @Test
@@ -88,7 +79,7 @@ public class BookServiceTest {
     @Test
     @DirtiesContext
     public void getAllCircuitOpen() {
-        Mockito.when(circuitBreaker.isClosed()).thenReturn(false);
+        given(circuitBreaker.isClosed()).willReturn(false);
         List<Book> books = bookService.getAll();
         assertEquals(3, books.size());
         bookService.getAll();
@@ -108,7 +99,7 @@ public class BookServiceTest {
     @Test
     @DirtiesContext
     public void getPageCircuitOpen() {
-        Mockito.when(circuitBreaker.isClosed()).thenReturn(false);
+        given(circuitBreaker.isClosed()).willReturn(false);
         List<Book> books = bookService.getBooks(PageRequest.of(1, 2));
         assertEquals(2, books.size());
         // call it one more time, we should get it from the cache now
@@ -129,7 +120,7 @@ public class BookServiceTest {
     @Test
     @DirtiesContext
     public void booksCountCircuitOpen() {
-        Mockito.when(circuitBreaker.isClosed()).thenReturn(false);
+        given(circuitBreaker.isClosed()).willReturn(false);
         final long count = bookService.getCount();
         assertEquals(3, count);
         // call it one more time, we should get it from the cache now

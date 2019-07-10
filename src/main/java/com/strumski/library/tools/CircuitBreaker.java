@@ -15,6 +15,8 @@
  */
 package com.strumski.library.tools;
 
+import org.springframework.stereotype.Component;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;

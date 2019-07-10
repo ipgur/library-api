@@ -2,7 +2,7 @@ package com.strumski.library.util;
 
 import org.springframework.context.annotation.Bean;
 
-public class DataSourceTestConfig {
+public class DataSourceTestCredentials {
 
     @Bean(name = "daoPassword")
     String providesDaoPassword() {

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.strumski.library.configuration;
+package com.strumski.library;
 
 /**
  * Configuration class containing some constant for API related flows

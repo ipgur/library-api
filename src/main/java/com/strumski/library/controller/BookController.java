@@ -17,25 +17,22 @@ package com.strumski.library.controller;
 
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
-import com.strumski.library.configuration.ApiConstants;
+import com.strumski.library.ApiConstants;
 import com.strumski.library.exceptions.InternalServerError;
 import com.strumski.library.entities.Book;
 import com.strumski.library.services.BookService;
 import com.strumski.library.tools.FileTools;
-import com.strumski.library.tools.CircuitBreaker;
-import net.kaczmarzyk.spring.data.jpa.domain.LikeIgnoreCase;
-import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -97,10 +94,15 @@ public class BookController {
     @GetMapping(value = "/books/{page}")
     @Transactional(readOnly = true)
     public List<Book> getListOfBooksByNamePageable(HttpServletResponse response, @PathVariable Integer page) {
-        response.addHeader(ApiConstants.X_TOTAL_COUNT_HEADER,
-                String.valueOf(bookService.getCount()));
-        return bookService.getBooks(PageRequest.of(page, ApiConstants.PAGE_SIZE,
-                Sort.by(ApiConstants.SORT_BY_TITLE)));
+        try {
+            response.addHeader(ApiConstants.X_TOTAL_COUNT_HEADER,
+                    String.valueOf(bookService.getCount()));
+            return bookService.getBooks(PageRequest.of(page, ApiConstants.PAGE_SIZE,
+                    Sort.by(ApiConstants.SORT_BY_TITLE)));
+        } catch(IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Non existing page", e);
+        }
+
     }
 
 }
